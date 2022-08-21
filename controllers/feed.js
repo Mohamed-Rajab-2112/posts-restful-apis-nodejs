@@ -3,6 +3,7 @@ const Post = require('../models/post')
 const User = require('../models/user')
 const path = require("path");
 const fs = require("fs");
+const io = require('../socket')
 
 const clearImage = filePath => {
     filePath = path.join(__dirname, '..', filePath);
@@ -13,7 +14,7 @@ exports.getPosts = (req, res, next) => {
     const currentPage = req.query.page || 1
     const perPage = 2
     let totalItems;
-    Post.find()
+    Post.find().populate('creator')
         .countDocuments()
         .then(count => {
         totalItems = count
@@ -67,6 +68,10 @@ exports.createPost = (req, res, next) => {
             return user.save()
         })
         .then(result => {
+            io.getIo().emit('posts', {
+                action: 'create',
+                post
+            })
             res.status(201).json({
                 message: 'Post created successfully!',
                 post: post ,

@@ -47,5 +47,10 @@ app.use((error, res) => {
 
 mongoose.connect('mongodb+srv://mrajab2112:nXmSQv7bU0BJ3Lk7@cluster0.sceyhl2.mongodb.net/test', {useNewUrlParser: true}).then(() => {
     console.log('database connected')
-    app.listen('8080')
+    const server = app.listen('8080')
+    const io = require('./socket').init( server)
+    io.on('connection', socket => {
+        console.log('client connect')
+    })
+
 }).catch(console.log)
